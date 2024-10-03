@@ -1,100 +1,94 @@
-import { Box, Text, Link, Octicon } from '@primer/react'
-import {
-    MarkGithubIcon,
-    CheckIcon,
-    CommentIcon,
-    MortarBoardIcon,
-} from '@primer/octicons-react'
+import React, { useState } from 'react'
+import { Box, useTheme } from '@primer/react'
+import Navbar from './Navbar'
+import Sidebar from './Sidebar'
+import RepositoryList from './RepositoryList'
+import DashboardContent from './DashboardContent'
+import ContributionActivity from './ContributionActivity'
+import ChangelogTimeline from './ChangelogTimeline'
 
-import MonaLoadingImage from './images/mona-loading.gif'
+const Playground = () => {
+    const { colorMode } = useTheme()
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-function Playground() {
-    /*
-    WELCOME TO MONA's 😽🐙 PLAYGROUND
-    Delete everything in here or play with the existing Mona playground code to get familiar with Primer React.
-    Documentation: https://primer.style/react
-    Documentation colors: https://primer.style/primitives/colors
-  */
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen)
+
+    const borderColor = 'border.default'
 
     return (
         <Box
             sx={{
-                bg: 'canvas.default',
-                width: '100%',
-                minHeight: '100vh',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                p: 5,
+                minHeight: '100vh',
+                bg: colorMode === 'day' ? 'canvas.default' : 'canvas.inset',
+                color: 'fg.default',
+                position: 'relative',
             }}
         >
-            <MarkGithubIcon size={24} />
-            <Box
-                sx={{
-                    maxWidth: 600,
-                    width: '100%',
-                    height: 300,
-                    bg: 'neutral.emphasisPlus',
-                    borderRadius: 2,
-                    p: 4,
-                    my: 6,
-                }}
-            >
-                <CodeLine icon={CheckIcon} iconColor="success.fg">
-                    Mona's playground successfully initialised...
-                </CodeLine>
-                <CodeLine icon={CommentIcon} iconColor="accent.fg">
-                    Visit <Text color="text.warning">src/Playground.js</Text>{' '}
-                    and start building your own layouts using Primer.
-                </CodeLine>
-                <Box display="inline-block" ml={3} mt={2}>
-                    <img
-                        src={MonaLoadingImage}
-                        alt="mona"
-                        width={48}
-                        height={48}
-                    />
+            {/* Overlay */}
+            {isSidebarOpen && (
+                <Box
+                    sx={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        bg: 'rgba(0, 0, 0, 0.5)',
+                        zIndex: 20,
+                        transition: 'opacity 0.3s ease',
+                        opacity: isSidebarOpen ? 1 : 0,
+                        pointerEvents: isSidebarOpen ? 'auto' : 'none',
+                    }}
+                    onClick={toggleSidebar}
+                />
+            )}
+
+            <Navbar toggleSidebar={toggleSidebar} borderColor={borderColor} />
+            <Sidebar
+                isSidebarOpen={isSidebarOpen}
+                toggleSidebar={toggleSidebar}
+                textColor="fg.default"
+                borderColor={borderColor}
+                sidebarBoxShadow="shadow.medium"
+                hoverColor="accent.fg"
+            />
+            <Box sx={{ display: 'flex', flex: 1 }}>
+                <Box
+                    sx={{
+                        width: '250px',
+                        borderRight: '1px solid',
+                        borderColor: borderColor,
+                        overflowY: 'auto',
+                    }}
+                >
+                    <RepositoryList borderStyle={borderColor} />
+                </Box>
+                <Box
+                    sx={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        p: 4,
+                    }}
+                >
+                    <DashboardContent />
+                    <Box sx={{ mt: 4, flex: 1 }}>
+                        <ContributionActivity />
+                    </Box>
+                </Box>
+                <Box
+                    sx={{
+                        width: '300px',
+                        borderLeft: '1px solid',
+                        borderColor: borderColor,
+                        p: 3,
+                    }}
+                >
+                    <ChangelogTimeline />
                 </Box>
             </Box>
-            <Footer />
-        </Box>
-    )
-}
-
-function CodeLine({ icon, iconColor, children }) {
-    return (
-        <Box sx={{ display: 'flex', color: 'fg.onEmphasis', mb: 2 }}>
-            <Box sx={{ display: 'flex', mt: '2px', width: 20, minWidth: 20 }}>
-                <Octicon icon={icon} size={16} sx={{ color: iconColor }} />
-            </Box>
-            <Text
-                as="p"
-                sx={{ flex: 1, fontSize: 1, fontFamily: 'mono', ml: 2 }}
-            >
-                {children}
-            </Text>
-        </Box>
-    )
-}
-
-function Footer() {
-    return (
-        <Box sx={{ textAlign: 'center' }}>
-            <Box sx={{ mr: 2, display: 'inline-block' }}>
-                <Octicon
-                    icon={MortarBoardIcon}
-                    size={16}
-                    sx={{ mr: 1, color: 'attention.fg' }}
-                />
-                <Text sx={{ color: 'attention.fg' }}>Tip</Text>
-            </Box>
-            <Text>
-                Before you get started check out our{' '}
-                <Link href="https://primer.style/react" target="_blank">
-                    Primer React Documentation
-                </Link>
-            </Text>
         </Box>
     )
 }
