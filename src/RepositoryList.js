@@ -47,6 +47,9 @@ const RepositoryList = ({ borderStyle }) => {
                 borderRight: `1px solid ${borderStyle}`,
             }}
         >
+            {/* Internal margin before the repository list starts */}
+            <Box sx={{ marginBottom: '20px' }}></Box>
+
             <Box
                 display="flex"
                 justifyContent="space-between"
