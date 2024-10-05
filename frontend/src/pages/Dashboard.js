@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
 import { Box, useTheme } from '@primer/react'
-import Navbar from './Navbar'
-import Sidebar from './Sidebar'
-import RepositoryList from './RepositoryList'
-import DashboardContent from './DashboardContent'
-import ContributionActivity from './ContributionActivity'
-import ChangelogTimeline from './ChangelogTimeline'
+import Navbar from '../common/Navbar'
+import Sidebar from '../common/Sidebar'
+import RepositoryList from '../components/dashboard/RepositoryList'
+import DashboardContent from '../components/dashboard/DashboardContent'
+import ContributionActivity from '../components/dashboard/ContributionActivity'
+import ChangelogTimeline from '../components/dashboard/ChangelogTimeline'
+import ColorModeSwitcher from '../ColorModeSwitcher'
 
-const Playground = () => {
+const Dashboard = () => {
     const { colorMode } = useTheme()
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
@@ -26,7 +27,10 @@ const Playground = () => {
                 position: 'relative',
             }}
         >
-            {/* Overlay */}
+            <Box sx={{ position: 'absolute', top: 0, right: 0, p: 3, zIndex: 100 }}>
+                <ColorModeSwitcher />
+            </Box>
+
             {isSidebarOpen && (
                 <Box
                     sx={{
@@ -93,4 +97,4 @@ const Playground = () => {
     )
 }
 
-export default Playground
+export default Dashboard

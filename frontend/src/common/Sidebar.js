@@ -12,8 +12,8 @@ import {
     SearchIcon,
     GlobeIcon,
     MegaphoneIcon,
-    MarkGithubIcon,
-} from '@primer/styled-octicons'
+} from '@primer/octicons-react'
+import hirayaLogo from '../images/hiraya-logo.png'
 
 const Sidebar = ({
     isSidebarOpen,
@@ -58,13 +58,17 @@ const Sidebar = ({
                 alignItems="center"
                 mb={2}
             >
-                <MarkGithubIcon size={32} />
+                <img
+                    src={hirayaLogo}
+                    alt="Hiraya Logo"
+                    width="32"
+                    height="32"
+                />
                 <IconButton
                     icon={XIcon}
                     variant="invisible"
                     aria-label="Close"
-                    color={textColor}
-                    sx={{ ':hover': { color: hoverColor } }}
+                    sx={{ color: textColor, ':hover': { color: hoverColor } }}
                     onClick={toggleSidebar}
                 />
             </Box>
@@ -81,8 +85,6 @@ const Sidebar = ({
                     ].map((item, index) => (
                         <ActionList.Item
                             key={index}
-                            as="a"
-                            href="#"
                             sx={{
                                 color: textColor,
                                 textDecoration: 'none',
@@ -108,8 +110,6 @@ const Sidebar = ({
                     ].map((item, index) => (
                         <ActionList.Item
                             key={index}
-                            as="a"
-                            href="#"
                             sx={{
                                 color: textColor,
                                 textDecoration: 'none',
@@ -137,11 +137,7 @@ const Sidebar = ({
                         p={1}
                         sx={{ paddingLeft: '8px' }}
                     >
-                        <SearchIcon
-                            size={16}
-                            color={textColor}
-                            style={{ marginRight: '2px' }}
-                        />
+                        <SearchIcon size={16} style={{ marginRight: '2px' }} />
                         <TextInput
                             placeholder="Find a repository"
                             sx={{
@@ -159,9 +155,12 @@ const Sidebar = ({
                             icon={XIcon}
                             aria-label="Close"
                             variant="invisible"
-                            color={textColor}
+                            sx={{
+                                color: textColor,
+                                ':hover': { color: hoverColor },
+                                ml: 1,
+                            }}
                             onClick={() => setShowSearch(false)}
-                            sx={{ ':hover': { color: hoverColor }, ml: 1 }}
                         />
                     </Box>
                 ) : (
@@ -183,9 +182,11 @@ const Sidebar = ({
                             icon={SearchIcon}
                             aria-label="Search"
                             variant="invisible"
-                            color={textColor}
+                            sx={{
+                                color: textColor,
+                                ':hover': { color: hoverColor },
+                            }}
                             onClick={() => setShowSearch(true)}
-                            sx={{ ':hover': { color: hoverColor } }}
                         />
                     </Box>
                 )}
@@ -195,8 +196,6 @@ const Sidebar = ({
                     {repositories.map((repo, index) => (
                         <ActionList.Item
                             key={index}
-                            as="a"
-                            href="#"
                             sx={{
                                 color: textColor,
                                 textDecoration: 'none',

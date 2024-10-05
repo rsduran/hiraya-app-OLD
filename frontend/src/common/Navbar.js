@@ -14,11 +14,11 @@ import {
     BellIcon,
     PlusIcon,
     GitBranchIcon,
-    MarkGithubIcon,
     ThreeBarsIcon,
 } from '@primer/octicons-react'
+import hirayaLogo from '../images/hiraya-logo.png'
 
-const Navbar = ({ toggleSidebar, borderColor }) => {
+const Navbar = ({ toggleSidebar }) => {
     const { colorMode } = useTheme()
 
     const NavItem = ({ children, tooltip }) => (
@@ -35,7 +35,7 @@ const Navbar = ({ toggleSidebar, borderColor }) => {
             p={2}
             bg={colorMode === 'day' ? 'canvas.default' : 'canvas.inset'}
             borderBottom="1px solid"
-            borderColor={borderColor}
+            borderColor="border.default"
         >
             <Box display="flex" alignItems="center">
                 <NavItem tooltip="Menu">
@@ -51,7 +51,12 @@ const Navbar = ({ toggleSidebar, borderColor }) => {
                         onClick={toggleSidebar}
                     />
                 </NavItem>
-                <MarkGithubIcon size={32} color="fg.default" />
+                <img
+                    src={hirayaLogo}
+                    alt="Hiraya Logo"
+                    width="32"
+                    height="32"
+                />
                 <Text
                     fontSize={1}
                     fontWeight={600}
@@ -62,7 +67,7 @@ const Navbar = ({ toggleSidebar, borderColor }) => {
                     }}
                     color="fg.default"
                 >
-                    Dashboard
+                    hiraya
                 </Text>
             </Box>
             <Box display="flex" alignItems="center">
