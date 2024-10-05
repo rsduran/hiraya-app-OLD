@@ -89,7 +89,12 @@ const WorkloadTaskPage = () => {
     const [workloadName, setWorkloadName] = useState('')
     const [taskTitle, setTaskTitle] = useState('')
     const [selectedWorkload, setSelectedWorkload] = useState('Create new workload')
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const { theme, colorMode } = useTheme()
+
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen)
+    }
 
     // Mock data for existing workloads
     const existingWorkloads = [
@@ -190,7 +195,7 @@ const WorkloadTaskPage = () => {
                 <Box sx={{ position: 'absolute', top: 0, right: 0, p: 3, zIndex: 100 }}>
                     <ColorModeSwitcher />
                 </Box>
-                <Navbar />
+                <Navbar toggleSidebar={toggleSidebar} />
                 <Box 
                     sx={{ 
                         display: 'flex', 
@@ -199,7 +204,7 @@ const WorkloadTaskPage = () => {
                         bg: colorMode === 'day' ? 'canvas.default' : 'canvas.inset',
                     }}
                 >
-                    <Sidebar />
+                    <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
                     <Box 
                         sx={{ 
                             flex: 1, 

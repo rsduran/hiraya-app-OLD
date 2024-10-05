@@ -46,11 +46,9 @@ const Sidebar = ({
             transition="width 0.3s ease"
             overflow="hidden"
             p={isSidebarOpen ? 3 : 0}
-            borderRight="1px solid"
-            borderColor="border.default"
             borderTopRightRadius={isSidebarOpen ? 15 : 0}
             zIndex={30}
-            boxShadow={sidebarBoxShadow}
+            boxShadow={isSidebarOpen ? '1px 0 3px rgba(0, 0, 0, 0.1)' : 'none'}
         >
             <Box
                 display="flex"
