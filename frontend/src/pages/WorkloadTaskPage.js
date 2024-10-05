@@ -321,7 +321,12 @@ const WorkloadTaskPage = () => {
                                 <Box mb={3} />
                             </FormControl>
 
-                            <Text fontWeight={600} fontSize="14px" mb={2}>
+                            <Text
+                                fontWeight={600}
+                                fontSize="14px"
+                                mb={2}
+                                color="fg.default"  // Add this line
+                            >
                                 Add a description
                             </Text>
                             <Box
