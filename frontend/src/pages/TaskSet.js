@@ -11,6 +11,7 @@ import {
     Heading,
 } from '@primer/react'
 import { RepoIcon, PinIcon } from '@primer/octicons-react'
+import { marked } from 'marked'
 import Navbar from '../common/Navbar'
 import Sidebar from '../common/Sidebar'
 import ColorModeSwitcher from '../ColorModeSwitcher'
@@ -56,6 +57,10 @@ const TaskSet = () => {
             // 'newest' and 'recently updated' use the same logic for now
             return [...tasks].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         }
+    }
+
+    const renderMarkdown = (content) => {
+        return { __html: marked(content) }
     }
 
     return (
@@ -219,8 +224,10 @@ const TaskSet = () => {
                                                             handleTaskClick(task.id)
                                                         }}
                                                         sx={{
-                                                            fontSize: 3,
-                                                            fontWeight: 'bold',
+                                                            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+                                                            fontSize: '20px',
+                                                            fontWeight: 600,
+                                                            lineHeight: '30px',
                                                             color: 'accent.fg',
                                                             textDecoration: 'none',
                                                             '&:hover': {
@@ -246,9 +253,21 @@ const TaskSet = () => {
                                                         {workload.visibility}
                                                     </Box>
                                                     {task.description && (
-                                                        <Box sx={{ mt: 2, color: 'fg.muted' }}>
-                                                            {task.description}
-                                                        </Box>
+                                                        <Box 
+                                                            sx={{ 
+                                                                mt: 2,
+                                                                color: 'rgb(145, 152, 161)',
+                                                                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+                                                                fontSize: '14px',
+                                                                fontWeight: 400,
+                                                                lineHeight: '21px',
+                                                                '& > *': {
+                                                                    fontSize: '14px !important',
+                                                                    lineHeight: '21px !important',
+                                                                }
+                                                            }}
+                                                            dangerouslySetInnerHTML={renderMarkdown(task.description)}
+                                                        />
                                                     )}
                                                 </Box>
                                                 <Button variant="outline" sx={{ ml: 3 }}>
