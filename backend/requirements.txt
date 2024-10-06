@@ -5,3 +5,4 @@ pg8000==1.29.1
 Werkzeug==2.2.3
 flask-cors
 Flask-Migrate==4.0.5
+Flask-SocketIO==5.3.4

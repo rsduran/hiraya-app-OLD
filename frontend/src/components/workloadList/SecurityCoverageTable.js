@@ -33,11 +33,18 @@ const SecurityCoverageTable = ({
         {
             header: 'Visibility',
             field: 'visibility',
-            width: '20%',
+            width: '15%',
             align: 'center',
             renderCell: (row) => (
                 <StyledLabel theme={theme}>{uppercase(row.visibility)}</StyledLabel>
             ),
+        },
+        {
+            header: 'Tasks',
+            field: 'tasks',
+            width: '15%',
+            align: 'center',
+            renderCell: (row) => (row.tasks ? row.tasks.length : 0),
         },
         {
             header: 'Updated',
@@ -53,7 +60,7 @@ const SecurityCoverageTable = ({
         {
             header: 'Actions',
             field: 'actions',
-            width: '20%',
+            width: '10%',
             align: 'center',
             renderCell: (row) => (
                 <ActionMenu>
@@ -81,6 +88,8 @@ const SecurityCoverageTable = ({
         pageIndex * pageSize,
         (pageIndex + 1) * pageSize
     )
+
+    console.log('Paginated data:', paginatedData) // Add this line for debugging
 
     return (
         <Box>

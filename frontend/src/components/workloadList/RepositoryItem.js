@@ -1,21 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Link, useTheme } from '@primer/react';
 import { FileIcon, ChevronDownIcon, ChevronRightIcon } from '@primer/octicons-react';
 import { StyledIconButton, StyledFileLink } from './StyledComponents';
-import { useNavigate } from 'react-router-dom';
 
 const RepositoryItem = ({ row }) => {
     const [isOpen, setIsOpen] = useState(false);
     const { theme } = useTheme();
-    const navigate = useNavigate();
+
+    useEffect(() => {
+        const expandedWorkloads = JSON.parse(localStorage.getItem('expandedWorkloads') || '{}');
+        setIsOpen(!!expandedWorkloads[row.id]);
+    }, [row.id]);
 
     const toggleTree = (e) => {
         e.stopPropagation();
-        setIsOpen(!isOpen);
+        const newIsOpen = !isOpen;
+        setIsOpen(newIsOpen);
+        
+        const expandedWorkloads = JSON.parse(localStorage.getItem('expandedWorkloads') || '{}');
+        if (newIsOpen) {
+            expandedWorkloads[row.id] = true;
+        } else {
+            delete expandedWorkloads[row.id];
+        }
+        localStorage.setItem('expandedWorkloads', JSON.stringify(expandedWorkloads));
     };
 
-    const handleTaskClick = (taskId) => {
-        navigate(`/workloads/${row.id}/tasks/${taskId}`);
+    const handleWorkloadClick = (e) => {
+        e.preventDefault();
+        window.open(`/workloads/${row.id}`, '_blank');
+    };
+
+    const handleTaskClick = (e, taskId) => {
+        e.preventDefault();
+        window.open(`/workloads/${row.id}/tasks/${taskId}`, '_blank');
     };
 
     return (
@@ -28,7 +46,7 @@ const RepositoryItem = ({ row }) => {
                     size="small"
                     sx={{ mr: 1 }}
                 />
-                <Link href={`#${row.name}`} onClick={(e) => e.preventDefault()}>
+                <Link href={`/workloads/${row.id}`} onClick={handleWorkloadClick}>
                     {row.name}
                 </Link>
             </Box>
@@ -44,8 +62,9 @@ const RepositoryItem = ({ row }) => {
                         >
                             <FileIcon size={16} />
                             <StyledFileLink
-                                onClick={() => handleTaskClick(task.id)}
-                                style={{ marginLeft: '8px', cursor: 'pointer' }}
+                                href={`/workloads/${row.id}/tasks/${task.id}`}
+                                onClick={(e) => handleTaskClick(e, task.id)}
+                                style={{ marginLeft: '8px' }}
                                 theme={theme}
                             >
                                 {task.title}

@@ -19,7 +19,7 @@ function App() {
                         <Route path="/" element={<HirayaLandingPage />} />
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/workloads" element={<WorkloadList />} />
-                        <Route path="/taskset" element={<TaskSet />} />
+                        <Route path="/workloads/:workloadId" element={<TaskSet />} />
                         <Route path="/workload-task" element={<WorkloadTaskPage />} />
                         <Route path="/workloads/:workloadId/tasks/:taskId" element={<TaskDetails />} />
                     </Routes>

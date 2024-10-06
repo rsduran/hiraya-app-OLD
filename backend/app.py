@@ -4,11 +4,14 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
 from flask_cors import CORS
+from flask_socketio import SocketIO
 import uuid
 import logging
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
+socketio = SocketIO(app, cors_allowed_origins="*")
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://rsduran:password@localhost/hiraya')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -69,6 +72,7 @@ def handle_workloads():
                 new_workload.tasks.append(new_task)
             db.session.add(new_workload)
             db.session.commit()
+            socketio.emit('workload_updated', {'type': 'workload_updated'}, namespace='/')
             return jsonify(new_workload.to_dict()), 201
         except Exception as e:
             db.session.rollback()
@@ -84,6 +88,21 @@ def get_workload(workload_id):
         app.logger.error(f"Error fetching workload {workload_id}: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/workloads/<workload_id>/tasks', methods=['POST'])
+def add_task_to_workload(workload_id):
+    try:
+        workload = Workload.query.get_or_404(workload_id)
+        data = request.json
+        new_task = Task(title=data['title'], description=data.get('description', ''), workload_id=workload_id)
+        db.session.add(new_task)
+        db.session.commit()
+        socketio.emit('task_added', {'type': 'task_added', 'workload_id': workload_id}, namespace='/')
+        return jsonify(new_task.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Error adding task to workload {workload_id}: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/api/workloads/<workload_id>/tasks/<task_id>', methods=['GET'])
 def get_task(workload_id, task_id):
     try:
@@ -95,7 +114,15 @@ def get_task(workload_id, task_id):
         app.logger.error(f"Error fetching task {task_id} for workload {workload_id}: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+@socketio.on('connect')
+def handle_connect():
+    app.logger.info('Client connected')
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    app.logger.info('Client disconnected')
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    socketio.run(app, debug=True)

@@ -6,6 +6,7 @@ import TableHeader from '../components/workloadList/TableHeader'
 import SecurityCoverageTable from '../components/workloadList/SecurityCoverageTable'
 import { ThemedBox } from '../components/workloadList/StyledComponents'
 import ColorModeSwitcher from '../ColorModeSwitcher'
+import { io } from 'socket.io-client'
 
 const WorkloadList = () => {
     const [data, setData] = useState([])
@@ -19,25 +20,45 @@ const WorkloadList = () => {
         setIsSidebarOpen(!isSidebarOpen)
     }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true)
-            try {
-                const response = await fetch('http://localhost:5000/api/workloads')
-                if (!response.ok) {
-                    throw new Error('Failed to fetch workloads')
-                }
-                const workloads = await response.json()
-                setData(workloads)
-            } catch (error) {
-                console.error('Error fetching workloads:', error)
-                // Handle error (e.g., show error message to user)
-            } finally {
-                setLoading(false)
+    const fetchWorkloads = async () => {
+        setLoading(true)
+        try {
+            const response = await fetch('http://localhost:5000/api/workloads')
+            if (!response.ok) {
+                throw new Error('Failed to fetch workloads')
             }
+            const workloads = await response.json()
+            setData(workloads)
+        } catch (error) {
+            console.error('Error fetching workloads:', error)
+            // Handle error (e.g., show error message to user)
+        } finally {
+            setLoading(false)
         }
+    }
 
-        fetchData()
+    useEffect(() => {
+        fetchWorkloads()
+
+        const socket = io('http://localhost:5000')
+
+        socket.on('connect', () => {
+            console.log('Connected to WebSocket')
+        })
+
+        socket.on('workload_updated', () => {
+            console.log('Workload updated')
+            fetchWorkloads()
+        })
+
+        socket.on('task_added', () => {
+            console.log('Task added')
+            fetchWorkloads()
+        })
+
+        return () => {
+            socket.disconnect()
+        }
     }, [])
 
     return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Text,
@@ -12,7 +12,7 @@ import {
     useTheme,
     ThemeProvider,
     Spinner,
-} from '@primer/react'
+} from '@primer/react';
 import {
     PencilIcon,
     EyeIcon,
@@ -26,11 +26,11 @@ import {
     TasklistIcon,
     FileIcon,
     MentionIcon,
-} from '@primer/octicons-react'
-import { marked } from 'marked'
-import Navbar from '../common/Navbar'
-import Sidebar from '../common/Sidebar'
-import ColorModeSwitcher from '../ColorModeSwitcher'
+} from '@primer/octicons-react';
+import { marked } from 'marked';
+import Navbar from '../common/Navbar';
+import Sidebar from '../common/Sidebar';
+import ColorModeSwitcher from '../ColorModeSwitcher';
 
 const EditorToolbar = ({ onIconClick }) => (
     <ActionMenu>
@@ -81,45 +81,45 @@ const EditorToolbar = ({ onIconClick }) => (
             </ActionList>
         </ActionMenu.Overlay>
     </ActionMenu>
-)
+);
 
 const WorkloadTaskPage = () => {
-    const [selectedTab, setSelectedTab] = useState('write')
-    const [content, setContent] = useState('')
-    const [workloadName, setWorkloadName] = useState('')
-    const [taskTitle, setTaskTitle] = useState('')
-    const [selectedWorkload, setSelectedWorkload] = useState('Create new workload')
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-    const [visibility, setVisibility] = useState('private')
-    const [isLoading, setIsLoading] = useState(false)
-    const [currentDateTime, setCurrentDateTime] = useState('')
-    const [existingWorkloads, setExistingWorkloads] = useState(['Create new workload'])
-    const { theme, colorMode } = useTheme()
+    const [selectedTab, setSelectedTab] = useState('write');
+    const [content, setContent] = useState('');
+    const [workloadName, setWorkloadName] = useState('');
+    const [taskTitle, setTaskTitle] = useState('');
+    const [selectedWorkload, setSelectedWorkload] = useState({ id: 'create-new', name: 'Create new workload' });
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [visibility, setVisibility] = useState('private');
+    const [isLoading, setIsLoading] = useState(false);
+    const [currentDateTime, setCurrentDateTime] = useState('');
+    const [existingWorkloads, setExistingWorkloads] = useState([]);
+    const { theme, colorMode } = useTheme();
 
     const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen)
-    }
+        setIsSidebarOpen(!isSidebarOpen);
+    };
 
     useEffect(() => {
         const fetchWorkloads = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/workloads')
+                const response = await fetch('http://localhost:5000/api/workloads');
                 if (!response.ok) {
-                    throw new Error('Failed to fetch workloads')
+                    throw new Error('Failed to fetch workloads');
                 }
-                const workloads = await response.json()
-                setExistingWorkloads(['Create new workload', ...workloads.map(w => w.name)])
+                const workloads = await response.json();
+                setExistingWorkloads(workloads.map((w) => ({ id: w.id, name: w.name, visibility: w.visibility })));
             } catch (error) {
-                console.error('Error fetching workloads:', error)
+                console.error('Error fetching workloads:', error);
             }
-        }
+        };
 
-        fetchWorkloads()
-    }, [])
+        fetchWorkloads();
+    }, []);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            const now = new Date()
+            const now = new Date();
             const options = {
                 timeZone: 'Asia/Manila',
                 year: 'numeric',
@@ -128,69 +128,69 @@ const WorkloadTaskPage = () => {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: true
-            }
-            setCurrentDateTime(now.toLocaleString('en-US', options))
-        }, 1000)
+                hour12: true,
+            };
+            setCurrentDateTime(now.toLocaleString('en-US', options));
+        }, 1000);
 
-        return () => clearInterval(interval)
-    }, [])
+        return () => clearInterval(interval);
+    }, []);
 
     const renderMarkdown = () => {
-        return { __html: marked(content) }
-    }
+        return { __html: marked(content) };
+    };
 
     const insertMarkdownSyntax = (syntax) => {
-        const textarea = document.getElementById('markdown-textarea')
-        const start = textarea.selectionStart
-        const end = textarea.selectionEnd
-        const text = textarea.value
-        const before = text.substring(0, start)
-        const after = text.substring(end, text.length)
-        let newContent = ''
+        const textarea = document.getElementById('markdown-textarea');
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value;
+        const before = text.substring(0, start);
+        const after = text.substring(end, text.length);
+        let newContent = '';
 
         switch (syntax) {
             case 'bold':
-                newContent = `${before}**${text.substring(start, end)}**${after}`
-                break
+                newContent = `${before}**${text.substring(start, end)}**${after}`;
+                break;
             case 'italic':
-                newContent = `${before}_${text.substring(start, end)}_${after}`
-                break
+                newContent = `${before}_${text.substring(start, end)}_${after}`;
+                break;
             case 'quote':
-                newContent = `${before}> ${text.substring(start, end)}\n${after}`
-                break
+                newContent = `${before}> ${text.substring(start, end)}\n${after}`;
+                break;
             case 'code':
-                newContent = `${before}\`\`\`\n${text.substring(start, end)}\n\`\`\`${after}`
-                break
+                newContent = `${before}\`\`\`${text.substring(start, end)}\`\`\`${after}`;
+                break;
             case 'link':
-                newContent = `${before}[${text.substring(start, end)}](url)${after}`
-                break
+                newContent = `${before}[${text.substring(start, end)}](url)${after}`;
+                break;
             case 'unordered-list':
-                newContent = `${before}- ${text.substring(start, end)}\n${after}`
-                break
+                newContent = `${before}- ${text.substring(start, end)}\n${after}`;
+                break;
             case 'ordered-list':
-                newContent = `${before}1. ${text.substring(start, end)}\n${after}`
-                break
+                newContent = `${before}1. ${text.substring(start, end)}\n${after}`;
+                break;
             case 'task-list':
-                newContent = `${before}- [ ] ${text.substring(start, end)}\n${after}`
-                break
+                newContent = `${before}- [ ] ${text.substring(start, end)}\n${after}`;
+                break;
             case 'attach-file':
-                newContent = `${before}![File](file_url)${after}`
-                break
+                newContent = `${before}![File](file_url)${after}`;
+                break;
             case 'mention':
-                newContent = `${before}@${text.substring(start, end)}${after}`
-                break
+                newContent = `${before}@${text.substring(start, end)}${after}`;
+                break;
             default:
-                break
+                break;
         }
 
-        setContent(newContent)
-        textarea.focus()
-    }
+        setContent(newContent);
+        textarea.focus();
+    };
 
     const getTabStyles = (tabName) => {
-        const isSelected = selectedTab === tabName
-        const isLight = theme?.colorScheme === 'light'
+        const isSelected = selectedTab === tabName;
+        const isLight = theme?.colorScheme === 'light';
 
         return {
             bg: isSelected
@@ -218,41 +218,57 @@ const WorkloadTaskPage = () => {
                     ? 'fg.onEmphasis'
                     : 'fg.default',
             },
-        }
-    }
+        };
+    };
 
     const handleSubmit = async () => {
         setIsLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/workloads', {
-                method: 'POST',
+            const isNewWorkload = selectedWorkload.id === 'create-new';
+            const url = isNewWorkload
+                ? 'http://localhost:5000/api/workloads'
+                : `http://localhost:5000/api/workloads/${selectedWorkload.id}/tasks`;
+
+            const method = 'POST';
+            const body = isNewWorkload
+                ? JSON.stringify({
+                      name: workloadName,
+                      visibility: visibility,
+                      tasks: [{ title: taskTitle, description: content }],
+                  })
+                : JSON.stringify({ title: taskTitle, description: content });
+
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    name: selectedWorkload === 'Create new workload' ? workloadName : selectedWorkload,
-                    visibility: visibility,
-                    tasks: [
-                        {
-                            title: taskTitle,
-                            description: content
-                        }
-                    ]
-                }),
+                body: body,
             });
+
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to create workload');
+                throw new Error(errorData.error || 'Failed to create workload or task');
             }
+
             const result = await response.json();
-            console.log('Workload created:', result);
+            console.log(isNewWorkload ? 'Workload created:' : 'Task added:', result);
             // Reset form or navigate to a new page
+            // You might want to add a success message here
         } catch (error) {
-            console.error('Error creating workload:', error.message);
-            // Handle error (e.g., show error message to user)
-            // You might want to add a state variable to store and display this error message
+            console.error('Error:', error.message);
+            // You might want to add an error message here
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleWorkloadSelect = (workload) => {
+        setSelectedWorkload(workload);
+        if (workload.id !== 'create-new') {
+            setVisibility(workload.visibility);
+        } else {
+            setVisibility('private'); // Reset to default when creating new workload
         }
     };
 
@@ -263,25 +279,9 @@ const WorkloadTaskPage = () => {
                     <ColorModeSwitcher />
                 </Box>
                 <Navbar toggleSidebar={toggleSidebar} />
-                <Box 
-                    sx={{ 
-                        display: 'flex', 
-                        flex: 1, 
-                        overflow: 'hidden',
-                        bg: colorMode === 'day' ? 'canvas.default' : 'canvas.inset',
-                    }}
-                >
+                <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', bg: colorMode === 'day' ? 'canvas.default' : 'canvas.inset' }}>
                     <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-                    <Box 
-                        sx={{ 
-                            flex: 1, 
-                            overflow: 'auto', 
-                            padding: 4,
-                            display: 'flex',
-                            justifyContent: 'center', 
-                            alignItems: 'flex-start', 
-                        }}
-                    >
+                    <Box sx={{ flex: 1, overflow: 'auto', padding: 4, display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
                         <Box
                             width="100%"
                             maxWidth="600px"
@@ -292,58 +292,48 @@ const WorkloadTaskPage = () => {
                             p={4}
                             bg={colorMode === 'day' ? 'canvas.subtle' : 'canvas.default'}
                         >
-                            <Text
-                                fontWeight={600}
-                                fontSize="16px"
-                                lineHeight="24px"
-                                color="fg.default"
-                                mb={3}
-                            >
+                            <Text fontWeight={600} fontSize="16px" lineHeight="24px" color="fg.default" mb={3}>
                                 Create a new Workload or add a Task to an existing Workload
                             </Text>
-                            <Text
-                                fontWeight={400}
-                                fontSize="14px"
-                                lineHeight="21px"
-                                color="fg.muted"
-                                mb={4}
-                                display="block"
-                            >
-                                A Workload contains all of your tasks and helps you organize
-                                your work efficiently.
+                            <Text fontWeight={400} fontSize="14px" lineHeight="21px" color="fg.muted" mb={4} display="block">
+                                A Workload contains all of your tasks and helps you organize your work efficiently.
                             </Text>
                             <FormControl id="existing-workload" mb={4}>
-                                <FormControl.Label>
-                                    Select an existing workload or create a new one
-                                </FormControl.Label>
+                                <FormControl.Label>Select an existing workload or create a new one</FormControl.Label>
                                 <ActionMenu>
-                                    <ActionMenu.Button>{selectedWorkload}</ActionMenu.Button>
+                                    <ActionMenu.Button>{selectedWorkload.name}</ActionMenu.Button>
                                     <ActionMenu.Overlay width="medium">
                                         <ActionList selectionVariant="single">
-                                            {existingWorkloads.map((workload, index) => (
+                                            <ActionList.Item
+                                                key="create-new"
+                                                selected={selectedWorkload.id === 'create-new'}
+                                                onSelect={() => handleWorkloadSelect({ id: 'create-new', name: 'Create new workload' })}
+                                            >
+                                                Create new workload
+                                            </ActionList.Item>
+                                            {existingWorkloads.map((workload) => (
                                                 <ActionList.Item
-                                                    key={index}
-                                                    selected={workload === selectedWorkload}
-                                                    onSelect={() => setSelectedWorkload(workload)}
+                                                    key={workload.id}
+                                                    selected={workload.id === selectedWorkload.id}
+                                                    onSelect={() => handleWorkloadSelect(workload)}
                                                 >
-                                                    {workload}
+                                                    {workload.name}
                                                 </ActionList.Item>
                                             ))}
                                         </ActionList>
                                     </ActionMenu.Overlay>
                                 </ActionMenu>
+                                <Box mb={4} />
                             </FormControl>
 
-                            {selectedWorkload === 'Create new workload' && (
+                            {selectedWorkload.id === 'create-new' && (
                                 <FormControl id="workload-name" mb={4}>
-                                    <FormControl.Label>
-                                        New Workload name
-                                    </FormControl.Label>
+                                    <FormControl.Label>New Workload name</FormControl.Label>
                                     <TextInput
                                         value={workloadName}
                                         onChange={(e) => setWorkloadName(e.target.value)}
                                         placeholder="Name your new workload..."
-                                        sx={{ width: '100%' }}
+                                        sx={{ width: '100%', mb: 4 }}
                                     />
                                 </FormControl>
                             )}
@@ -352,10 +342,10 @@ const WorkloadTaskPage = () => {
                                 <Text fontWeight={600} fontSize="14px" mb={2} color="fg.default">
                                     Visibility
                                 </Text>
-                                <FormControl id="visibility-public">
-                                    <Radio 
-                                        name="visibility" 
-                                        value="public" 
+                                <FormControl disabled={selectedWorkload.id !== 'create-new'}>
+                                    <Radio
+                                        name="visibility"
+                                        value="public"
                                         checked={visibility === 'public'}
                                         onChange={() => setVisibility('public')}
                                     />
@@ -364,10 +354,10 @@ const WorkloadTaskPage = () => {
                                 <Text fontSize="12px" color="fg.muted" ml={4} mb={2}>
                                     Anyone can see this workload
                                 </Text>
-                                <FormControl id="visibility-private">
-                                    <Radio 
-                                        name="visibility" 
-                                        value="private" 
+                                <FormControl disabled={selectedWorkload.id !== 'create-new'}>
+                                    <Radio
+                                        name="visibility"
+                                        value="private"
                                         checked={visibility === 'private'}
                                         onChange={() => setVisibility('private')}
                                     />
@@ -379,34 +369,19 @@ const WorkloadTaskPage = () => {
                             </Box>
 
                             <FormControl id="task-title" mb={4}>
-                                <FormControl.Label>
-                                    Task title
-                                </FormControl.Label>
+                                <FormControl.Label>Task title</FormControl.Label>
                                 <TextInput
                                     value={taskTitle}
                                     onChange={(e) => setTaskTitle(e.target.value)}
                                     placeholder="Enter task title..."
-                                    sx={{ width: '100%' }}
+                                    sx={{ width: '100%', mb: 4 }}
                                 />
                             </FormControl>
 
-                            <Text
-                                fontWeight={600}
-                                fontSize="14px"
-                                mb={2}
-                                color="fg.default"
-                            >
+                            <Text fontWeight={600} fontSize="14px" mb={2} color="fg.default">
                                 Task description
                             </Text>
-                            <Box
-                                bg="canvas.default"
-                                borderColor="border.default"
-                                borderWidth={1}
-                                borderStyle="solid"
-                                borderRadius="6px"
-                                overflow="hidden"
-                                mb={4}
-                            >
+                            <Box bg="canvas.default" borderColor="border.default" borderWidth={1} borderStyle="solid" borderRadius="6px" overflow="hidden" mb={4}>
                                 <Box
                                     sx={{
                                         display: 'flex',
@@ -419,21 +394,11 @@ const WorkloadTaskPage = () => {
                                     }}
                                 >
                                     <EditorToolbar onIconClick={insertMarkdownSyntax} />
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                        }}
-                                    >
-                                        <Button
-                                            onClick={() => setSelectedTab('write')}
-                                            sx={getTabStyles('write')}
-                                        >
+                                    <Box sx={{ display: 'flex' }}>
+                                        <Button onClick={() => setSelectedTab('write')} sx={getTabStyles('write')}>
                                             <PencilIcon /> Write
                                         </Button>
-                                        <Button
-                                            onClick={() => setSelectedTab('preview')}
-                                            sx={getTabStyles('preview')}
-                                        >
+                                        <Button onClick={() => setSelectedTab('preview')} sx={getTabStyles('preview')}>
                                             <EyeIcon /> Preview
                                         </Button>
                                     </Box>
@@ -455,7 +420,9 @@ const WorkloadTaskPage = () => {
                                                 minHeight: '200px',
                                                 bg: 'canvas.default',
                                                 color: 'fg.default',
-                                                '::placeholder': { color: 'fg.muted' },
+                                                '::placeholder': {
+                                                    color: 'fg.muted',
+                                                },
                                                 ':focus': {
                                                     outline: 'none',
                                                     boxShadow: '0 0 0 2px rgba(3, 102, 214, 0.3)',
@@ -466,14 +433,7 @@ const WorkloadTaskPage = () => {
                                 )}
 
                                 {selectedTab === 'preview' && (
-                                    <Box
-                                        sx={{
-                                            p: 4,
-                                            minHeight: '200px',
-                                            bg: 'canvas.default',
-                                            color: 'fg.default',
-                                        }}
-                                    >
+                                    <Box sx={{ p: 4, minHeight: '200px', bg: 'canvas.default', color: 'fg.default' }}>
                                         <div dangerouslySetInnerHTML={renderMarkdown()} />
                                     </Box>
                                 )}
@@ -485,23 +445,14 @@ const WorkloadTaskPage = () => {
                                 </Text>
                             </Box>
 
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'flex-end',
-                                }}
-                            >
-                                <Button 
-                                    variant="primary" 
-                                    onClick={handleSubmit}
-                                    disabled={isLoading}
-                                >
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                <Button variant="primary" onClick={handleSubmit} disabled={isLoading}>
                                     {isLoading ? (
                                         <Spinner size="small" />
+                                    ) : selectedWorkload.id !== 'create-new' ? (
+                                        'Create Task'
                                     ) : (
-                                        selectedWorkload !== 'Create new workload'
-                                            ? 'Create Task'
-                                            : 'Create Workload and Task'
+                                        'Create Workload and Task'
                                     )}
                                 </Button>
                             </Box>
@@ -510,7 +461,7 @@ const WorkloadTaskPage = () => {
                 </Box>
             </Box>
         </ThemeProvider>
-    )
-}
+    );
+};
 
-export default WorkloadTaskPage
+export default WorkloadTaskPage;

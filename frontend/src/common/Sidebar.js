@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { TextInput, Box, Text, IconButton, ActionList } from '@primer/react'
+import { TextInput, Box, Text, IconButton, ActionList, useTheme, ActionMenu } from '@primer/react'
 import {
     XIcon,
     HomeIcon,
@@ -12,19 +12,31 @@ import {
     SearchIcon,
     GlobeIcon,
     MegaphoneIcon,
+    SunIcon,
+    MoonIcon,
 } from '@primer/octicons-react'
 import hirayaLogo from '../images/hiraya-logo.png'
 
-const Sidebar = ({
-    isSidebarOpen,
-    toggleSidebar,
-    textColor,
-    borderColor,
-    sidebarBoxShadow,
-    hoverColor,
-}) => {
+const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
     const [showMore, setShowMore] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
+    const { setDayScheme, setNightScheme, colorScheme } = useTheme()
+
+    const setScheme = (schemeValue) => {
+        setDayScheme(schemeValue)
+        setNightScheme(schemeValue)
+    }
+
+    const schemes = [
+        { name: 'Light', value: 'light', icon: SunIcon },
+        { name: 'Light colorblind', value: 'light_colorblind', icon: SunIcon },
+        { name: 'Dark', value: 'dark', icon: MoonIcon },
+        { name: 'Dark colorblind', value: 'dark_colorblind', icon: MoonIcon },
+        { name: 'Dark high contrast', value: 'dark_high_contrast', icon: MoonIcon },
+        { name: 'Dark Dimmed', value: 'dark_dimmed', icon: MoonIcon },
+    ]
+
+    const current = schemes.find((scheme) => scheme.value === colorScheme)
 
     const repositories = [
         'rsduran/quiz-app',
@@ -42,7 +54,6 @@ const Sidebar = ({
             width={isSidebarOpen ? '300px' : '0'}
             height="100vh"
             bg="canvas.subtle"
-            color={textColor}
             transition="width 0.3s ease"
             overflow="hidden"
             p={isSidebarOpen ? 3 : 0}
@@ -50,7 +61,7 @@ const Sidebar = ({
             borderColor={isSidebarOpen ? "border.default" : "transparent"}
             borderTopRightRadius={isSidebarOpen ? 15 : 0}
             zIndex={30}
-            boxShadow={isSidebarOpen ? sidebarBoxShadow : "none"}
+            boxShadow={isSidebarOpen ? "shadow.medium" : "none"}
         >
             <Box
                 display="flex"
@@ -68,12 +79,11 @@ const Sidebar = ({
                     icon={XIcon}
                     variant="invisible"
                     aria-label="Close"
-                    sx={{ color: textColor, ':hover': { color: hoverColor } }}
                     onClick={toggleSidebar}
                 />
             </Box>
             <Box mb={2}>
-                <ActionList sx={{ padding: 0 }}>
+                <ActionList>
                     {[
                         { icon: HomeIcon, text: 'Home' },
                         { icon: IssueOpenedIcon, text: 'Issues' },
@@ -83,14 +93,7 @@ const Sidebar = ({
                         { icon: CodespacesIcon, text: 'Codespaces' },
                         { icon: CopilotIcon, text: 'Copilot' },
                     ].map((item, index) => (
-                        <ActionList.Item
-                            key={index}
-                            sx={{
-                                color: textColor,
-                                textDecoration: 'none',
-                                paddingLeft: '8px',
-                            }}
-                        >
+                        <ActionList.Item key={index}>
                             <ActionList.LeadingVisual>
                                 <item.icon />
                             </ActionList.LeadingVisual>
@@ -100,22 +103,15 @@ const Sidebar = ({
                 </ActionList>
             </Box>
 
-            <ActionList.Divider sx={{ backgroundColor: borderColor, my: 1 }} />
+            <ActionList.Divider />
 
             <Box mb={2}>
-                <ActionList sx={{ padding: 0 }}>
+                <ActionList>
                     {[
                         { icon: GlobeIcon, text: 'Explore' },
                         { icon: MegaphoneIcon, text: 'Marketplace' },
                     ].map((item, index) => (
-                        <ActionList.Item
-                            key={index}
-                            sx={{
-                                color: textColor,
-                                textDecoration: 'none',
-                                paddingLeft: '8px',
-                            }}
-                        >
+                        <ActionList.Item key={index}>
                             <ActionList.LeadingVisual>
                                 <item.icon />
                             </ActionList.LeadingVisual>
@@ -125,7 +121,7 @@ const Sidebar = ({
                 </ActionList>
             </Box>
 
-            <ActionList.Divider sx={{ backgroundColor: borderColor, my: 1 }} />
+            <ActionList.Divider />
 
             <Box mt={2}>
                 {showSearch ? (
@@ -135,9 +131,8 @@ const Sidebar = ({
                         bg="canvas.subtle"
                         borderRadius={2}
                         p={1}
-                        sx={{ paddingLeft: '8px' }}
                     >
-                        <SearchIcon size={16} style={{ marginRight: '2px' }} />
+                        <SearchIcon size={16} style={{ marginRight: '2px' }} color="fg.muted" />
                         <TextInput
                             placeholder="Find a repository"
                             sx={{
@@ -145,21 +140,16 @@ const Sidebar = ({
                                 border: 'none',
                                 boxShadow: 'none',
                                 ':focus': { boxShadow: 'none' },
-                                color: textColor,
-                                '::placeholder': { color: textColor },
                                 flexGrow: 1,
                                 paddingLeft: 0,
+                                color: 'fg.default',
+                                '::placeholder': { color: 'fg.muted' },
                             }}
                         />
                         <IconButton
                             icon={XIcon}
                             aria-label="Close"
                             variant="invisible"
-                            sx={{
-                                color: textColor,
-                                ':hover': { color: hoverColor },
-                                ml: 1,
-                            }}
                             onClick={() => setShowSearch(false)}
                         />
                     </Box>
@@ -168,13 +158,12 @@ const Sidebar = ({
                         display="flex"
                         justifyContent="space-between"
                         alignItems="center"
-                        sx={{ paddingLeft: '8px' }}
                     >
                         <Text
                             fontSize="12px"
                             lineHeight="20px"
                             fontWeight="600"
-                            color={textColor}
+                            color="fg.default"
                         >
                             Repositories
                         </Text>
@@ -182,32 +171,22 @@ const Sidebar = ({
                             icon={SearchIcon}
                             aria-label="Search"
                             variant="invisible"
-                            sx={{
-                                color: textColor,
-                                ':hover': { color: hoverColor },
-                            }}
+                            sx={{ color: 'fg.muted' }}
                             onClick={() => setShowSearch(true)}
                         />
                     </Box>
                 )}
             </Box>
             <Box overflowY="auto" flexGrow={1} mt={2}>
-                <ActionList sx={{ padding: 0 }}>
+                <ActionList>
                     {repositories.map((repo, index) => (
-                        <ActionList.Item
-                            key={index}
-                            sx={{
-                                color: textColor,
-                                textDecoration: 'none',
-                                paddingLeft: '8px',
-                            }}
-                        >
+                        <ActionList.Item key={index}>
                             <ActionList.LeadingVisual>
                                 <Box
                                     width={16}
                                     height={16}
                                     borderRadius="50%"
-                                    bg="#238636"
+                                    bg="success.emphasis"
                                 />
                             </ActionList.LeadingVisual>
                             {repo}
@@ -217,10 +196,8 @@ const Sidebar = ({
                         <ActionList.Item
                             onSelect={() => setShowMore(true)}
                             sx={{
-                                color: textColor,
                                 fontSize: '12px',
-                                paddingLeft: '8px',
-                                ':hover': { color: '#58a6ff' },
+                                ':hover': { color: 'accent.fg' },
                             }}
                         >
                             Show more
@@ -229,7 +206,7 @@ const Sidebar = ({
                 </ActionList>
             </Box>
 
-            <Box as="footer" fontSize="12px" color={textColor} mt={2}>
+            <Box as="footer" fontSize="12px" mt={2}>
                 <Text>© 2024 GitHub, Inc.</Text>
                 <Box display="flex" flexWrap="wrap" mt={1}>
                     {[
@@ -244,7 +221,7 @@ const Sidebar = ({
                             <Box
                                 as="a"
                                 href="#"
-                                color="#58a6ff"
+                                color="accent.fg"
                                 sx={{
                                     textDecoration: 'none',
                                     ':hover': {
@@ -261,7 +238,7 @@ const Sidebar = ({
                     <Box
                         as="a"
                         href="#"
-                        color="#58a6ff"
+                        color="accent.fg"
                         sx={{
                             textDecoration: 'none',
                             ':hover': { textDecoration: 'underline' },
@@ -274,7 +251,7 @@ const Sidebar = ({
                     <Box
                         as="a"
                         href="#"
-                        color="#58a6ff"
+                        color="accent.fg"
                         sx={{
                             textDecoration: 'none',
                             ':hover': { textDecoration: 'underline' },
@@ -283,6 +260,30 @@ const Sidebar = ({
                         Manage cookies
                     </Box>
                 </Box>
+            </Box>
+
+            <Box mt={2}>
+                <ActionMenu>
+                    <ActionMenu.Button size="small">
+                        <current.icon />
+                        <Box sx={{ display: 'inline-block', ml: 2 }}>
+                            {current.name}
+                        </Box>
+                    </ActionMenu.Button>
+                    <ActionMenu.Overlay align="end">
+                        <ActionList selectionVariant="single">
+                            {schemes.map((scheme) => (
+                                <ActionList.Item
+                                    key={scheme.value}
+                                    selected={scheme.value === colorScheme}
+                                    onSelect={() => setScheme(scheme.value)}
+                                >
+                                    {scheme.name}
+                                </ActionList.Item>
+                            ))}
+                        </ActionList>
+                    </ActionMenu.Overlay>
+                </ActionMenu>
             </Box>
         </Box>
     )
