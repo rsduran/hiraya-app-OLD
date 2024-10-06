@@ -24,6 +24,21 @@ const FileExplorer = ({ workloadId, taskId }) => {
         fetchWorkloadData()
     }, [workloadId])
 
+    const handleWorkloadClick = () => {
+        window.open(`/workloads/${workloadId}`, '_blank')
+    }
+
+    const handleTaskClick = (taskId) => {
+        window.open(`/workloads/${workloadId}/tasks/${taskId}`, '_blank')
+    }
+
+    const hoverStyle = {
+        '&:hover': {
+            textDecoration: 'underline',
+            cursor: 'pointer',
+        },
+    }
+
     return (
         <Box
             bg="canvas.subtle"
@@ -38,18 +53,30 @@ const FileExplorer = ({ workloadId, taskId }) => {
         >
             {workloadData && (
                 <TreeView aria-label="Files">
-                    <TreeView.Item id={workloadData.id} defaultExpanded>
+                    <TreeView.Item 
+                        id={workloadData.id} 
+                        defaultExpanded
+                        onSelect={handleWorkloadClick}
+                    >
                         <TreeView.LeadingVisual>
                             <TreeView.DirectoryIcon />
                         </TreeView.LeadingVisual>
-                        {workloadData.name}
+                        <Box as="span" sx={hoverStyle}>
+                            {workloadData.name}
+                        </Box>
                         <TreeView.SubTree>
                             {workloadData.tasks.map((task) => (
-                                <TreeView.Item key={task.id} id={task.id}>
+                                <TreeView.Item 
+                                    key={task.id} 
+                                    id={task.id}
+                                    onSelect={() => handleTaskClick(task.id)}
+                                >
                                     <TreeView.LeadingVisual>
                                         <FileIcon />
                                     </TreeView.LeadingVisual>
-                                    {task.title}
+                                    <Box as="span" sx={hoverStyle}>
+                                        {task.title}
+                                    </Box>
                                 </TreeView.Item>
                             ))}
                         </TreeView.SubTree>

@@ -11,12 +11,28 @@ export const ThemedBox = styled(Box)`
 
 export const StyledIconButton = styled(IconButton)`
     background: transparent !important;
-    border: none;
-    box-shadow: none;
-    color: ${(props) => props.theme.colors.fg.default};
-    &:hover,
+    border: none !important;
+    box-shadow: none !important;
+    color: ${(props) => props.theme.colors.fg.default} !important;
+    
+    &:hover {
+        background: ${(props) => props.theme.colorScheme === 'light' 
+            ? 'rgba(208, 215, 222, 0.32)' 
+            : 'rgba(177, 186, 196, 0.12)'} !important;
+    }
+    
+    &:active {
+        background: ${(props) => props.theme.colorScheme === 'light' 
+            ? 'rgba(208, 215, 222, 0.48)' 
+            : 'rgba(177, 186, 196, 0.2)'} !important;
+    }
+    
     &:focus {
-        background: ${(props) => props.theme.colors.actionListItem.default.hoverBg} !important;
+        outline: none !important;
+    }
+    
+    &:focus-visible {
+        box-shadow: ${(props) => props.theme.shadows.focus} !important;
     }
 `
 
@@ -30,11 +46,14 @@ export const StyledFileLink = styled.span`
 
 export const StyledKebabIconButton = styled(IconButton)`
     background: transparent !important;
-    border: none;
-    box-shadow: none;
-    color: ${(props) => props.theme.colors.fg.default};
+    border: none !important;
+    box-shadow: none !important;
+    color: ${(props) => props.theme.colors.fg.default} !important;
+    
     &:hover {
-        background: ${(props) => props.theme.colors.actionListItem.default.hoverBg} !important;
+        background: ${(props) => props.theme.colorScheme === 'light' 
+            ? 'rgba(208, 215, 222, 0.32)' 
+            : 'rgba(177, 186, 196, 0.12)'} !important;
     }
 `
 

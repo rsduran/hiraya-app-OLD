@@ -53,7 +53,7 @@ const SecurityCoverageTable = ({
             align: 'center',
             renderCell: (row) => {
                 const date = new Date(row.updatedAt)
-                return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`
+                return `${date.toLocaleDateString()}, ${date.toLocaleTimeString()}`
             },
             sortBy: (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
         },

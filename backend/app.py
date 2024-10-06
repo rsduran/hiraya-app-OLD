@@ -19,12 +19,29 @@ migrate = Migrate(app, db)
 
 logging.basicConfig(level=logging.DEBUG)
 
+class Comment(db.Model):
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    content = db.Column(db.Text, nullable=False)
+    user = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    task_id = db.Column(db.String(36), db.ForeignKey('task.id'), nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'content': self.content,
+            'user': self.user,
+            'createdAt': self.created_at.isoformat(),
+            'taskId': self.task_id
+        }
+
 class Task(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     workload_id = db.Column(db.String(36), db.ForeignKey('workload.id'), nullable=False)
+    comments = db.relationship('Comment', backref='task', lazy=True)
 
     def to_dict(self):
         return {
@@ -32,7 +49,8 @@ class Task(db.Model):
             'title': self.title,
             'description': self.description,
             'createdAt': self.created_at.isoformat(),
-            'workloadId': self.workload_id
+            'workloadId': self.workload_id,
+            'comments': [comment.to_dict() for comment in self.comments]
         }
 
 class Workload(db.Model):
@@ -113,6 +131,28 @@ def get_task(workload_id, task_id):
     except Exception as e:
         app.logger.error(f"Error fetching task {task_id} for workload {workload_id}: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/workloads/<workload_id>/tasks/<task_id>/comments', methods=['GET', 'POST'])
+def handle_comments(workload_id, task_id):
+    if request.method == 'GET':
+        try:
+            comments = Comment.query.filter_by(task_id=task_id).order_by(Comment.created_at).all()
+            return jsonify([comment.to_dict() for comment in comments])
+        except Exception as e:
+            app.logger.error(f"Error fetching comments for task {task_id}: {str(e)}")
+            return jsonify({"error": str(e)}), 500
+    elif request.method == 'POST':
+        try:
+            data = request.json
+            new_comment = Comment(content=data['content'], user=data['user'], task_id=task_id)
+            db.session.add(new_comment)
+            db.session.commit()
+            socketio.emit('comment_added', {'type': 'comment_added', 'task_id': task_id}, namespace='/')
+            return jsonify(new_comment.to_dict()), 201
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Error adding comment to task {task_id}: {str(e)}")
+            return jsonify({"error": str(e)}), 500
 
 @socketio.on('connect')
 def handle_connect():

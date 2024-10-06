@@ -4,7 +4,7 @@ import { PencilIcon, EyeIcon } from '@primer/octicons-react'
 import { marked } from 'marked'
 import EditorToolbar from './EditorToolbar'
 
-const AddComment = () => {
+const AddComment = ({ onCommentSubmit }) => {
     const [selectedTab, setSelectedTab] = useState('write')
     const [content, setContent] = useState('')
     const { theme } = useTheme()
@@ -114,14 +114,21 @@ const AddComment = () => {
         }
     }
 
+    const handleSubmit = () => {
+        onCommentSubmit(content)
+        setContent('')
+    }
+
+    const handleClearComment = () => {
+        setContent('')
+    }
+
     return (
         <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 4, mt: 4 }}>
-            {' '}
-            {/* Added mt: 4 here */}
             <Avatar
-                src="https://github.com/ghost.png"
+                src="https://avatars.githubusercontent.com/u/583231?v=4" // Different avatar for Tech Lead
                 size={40}
-                alt="Your avatar"
+                alt="Tech Lead avatar"
                 sx={{ mr: 2 }}
             />
             <Box sx={{ flex: 1 }}>
@@ -226,10 +233,10 @@ const AddComment = () => {
                         mt: 3,
                     }}
                 >
-                    <Button variant="danger" sx={{ px: 4, py: 3, mr: 2 }}>
-                        Close pull request
+                    <Button onClick={handleClearComment} variant="danger" sx={{ px: 4, py: 3, mr: 2 }}>
+                        Clear comment
                     </Button>
-                    <Button variant="primary" sx={{ px: 4, py: 3 }}>
+                    <Button onClick={handleSubmit} variant="primary" sx={{ px: 4, py: 3 }}>
                         Comment
                     </Button>
                 </Box>
