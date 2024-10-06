@@ -46,7 +46,7 @@ const RepositoryItem = ({ row }) => {
                     size="small"
                     sx={{ mr: 1 }}
                 />
-                <Link href={`/workloads/${row.id}`} onClick={handleWorkloadClick}>
+                <Link href={`/workloads/${row.id}`} onClick={handleWorkloadClick} color={theme.colors.fg.default}>
                     {row.name}
                 </Link>
             </Box>
@@ -60,12 +60,11 @@ const RepositoryItem = ({ row }) => {
                             mb={1}
                             ml={3}
                         >
-                            <FileIcon size={16} />
+                            <FileIcon size={16} color={theme.colors.fg.muted} />
                             <StyledFileLink
                                 href={`/workloads/${row.id}/tasks/${task.id}`}
                                 onClick={(e) => handleTaskClick(e, task.id)}
                                 style={{ marginLeft: '8px' }}
-                                theme={theme}
                             >
                                 {task.title}
                             </StyledFileLink>

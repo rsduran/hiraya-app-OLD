@@ -6,21 +6,23 @@ export const ThemedBox = styled(Box)`
     padding: ${(props) => props.theme.space[4]};
     border-radius: ${(props) => props.theme.radii[2]};
     box-shadow: ${(props) => props.theme.shadows.medium};
+    background-color: ${(props) => props.theme.colors.canvas.default};
 `
 
 export const StyledIconButton = styled(IconButton)`
     background: transparent !important;
     border: none;
     box-shadow: none;
+    color: ${(props) => props.theme.colors.fg.default};
     &:hover,
     &:focus {
-        background: transparent !important;
+        background: ${(props) => props.theme.colors.actionListItem.default.hoverBg} !important;
     }
 `
 
 export const StyledFileLink = styled.span`
     cursor: pointer;
-    color: ${(props) => props.theme.colors.fg.default};
+    color: ${(props) => props.theme.colors.accent.fg};
     &:hover {
         text-decoration: underline;
     }
@@ -30,9 +32,9 @@ export const StyledKebabIconButton = styled(IconButton)`
     background: transparent !important;
     border: none;
     box-shadow: none;
+    color: ${(props) => props.theme.colors.fg.default};
     &:hover {
-        background: ${(props) =>
-            props.theme.colors.actionListItem.default.hoverBg} !important;
+        background: ${(props) => props.theme.colors.actionListItem.default.hoverBg} !important;
     }
 `
 

@@ -36,7 +36,7 @@ const SecurityCoverageTable = ({
             width: '15%',
             align: 'center',
             renderCell: (row) => (
-                <StyledLabel theme={theme}>{uppercase(row.visibility)}</StyledLabel>
+                <StyledLabel>{uppercase(row.visibility)}</StyledLabel>
             ),
         },
         {
@@ -68,7 +68,6 @@ const SecurityCoverageTable = ({
                         <StyledKebabIconButton
                             icon={KebabHorizontalIcon}
                             aria-label={`Actions for ${row.name}`}
-                            theme={theme}
                         />
                     </ActionMenu.Anchor>
                     <ActionMenu.Overlay>
@@ -89,8 +88,6 @@ const SecurityCoverageTable = ({
         (pageIndex + 1) * pageSize
     )
 
-    console.log('Paginated data:', paginatedData) // Add this line for debugging
-
     return (
         <Box>
             {loading ? (
@@ -104,6 +101,10 @@ const SecurityCoverageTable = ({
                         columns={columns}
                         initialSortColumn="updatedAt"
                         initialSortDirection="DESC"
+                        sx={{
+                            '& th': { color: theme.colors.fg.default },
+                            '& td': { color: theme.colors.fg.default },
+                        }}
                     />
                     <Table.Pagination
                         pageSize={pageSize}
