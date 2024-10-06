@@ -3,7 +3,6 @@ import {
     Box,
     Spinner,
     useTheme,
-    LabelGroup,
     ActionMenu,
     ActionList,
 } from '@primer/react'
@@ -25,19 +24,19 @@ const SecurityCoverageTable = ({
 
     const columns = [
         {
-            header: 'Repository',
+            header: 'Workload',
             field: 'name',
             rowHeader: true,
-            width: '30%',
+            width: '40%',
             renderCell: (row) => <RepositoryItem row={row} />,
         },
         {
-            header: 'Type',
-            field: 'type',
+            header: 'Visibility',
+            field: 'visibility',
             width: '20%',
             align: 'center',
             renderCell: (row) => (
-                <StyledLabel theme={theme}>{uppercase(row.type)}</StyledLabel>
+                <StyledLabel theme={theme}>{uppercase(row.visibility)}</StyledLabel>
             ),
         },
         {
@@ -45,29 +44,16 @@ const SecurityCoverageTable = ({
             field: 'updatedAt',
             width: '20%',
             align: 'center',
-            renderCell: (row) => new Date(row.updatedAt).toLocaleDateString(),
+            renderCell: (row) => {
+                const date = new Date(row.updatedAt)
+                return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`
+            },
             sortBy: (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt),
-        },
-        {
-            header: 'Status',
-            field: 'securityFeatures.dependabot',
-            width: '20%',
-            align: 'center',
-            renderCell: (row) =>
-                row.securityFeatures.dependabot.length > 0 ? (
-                    <LabelGroup>
-                        {row.securityFeatures.dependabot.map((feature) => (
-                            <StyledLabel key={feature} theme={theme}>
-                                {uppercase(feature)}
-                            </StyledLabel>
-                        ))}
-                    </LabelGroup>
-                ) : null,
         },
         {
             header: 'Actions',
             field: 'actions',
-            width: '10%',
+            width: '20%',
             align: 'center',
             renderCell: (row) => (
                 <ActionMenu>
@@ -80,9 +66,9 @@ const SecurityCoverageTable = ({
                     </ActionMenu.Anchor>
                     <ActionMenu.Overlay>
                         <ActionList>
-                            <ActionList.Item>Edit row</ActionList.Item>
+                            <ActionList.Item>Edit workload</ActionList.Item>
                             <ActionList.Item variant="danger">
-                                Delete row
+                                Delete workload
                             </ActionList.Item>
                         </ActionList>
                     </ActionMenu.Overlay>
@@ -103,8 +89,8 @@ const SecurityCoverageTable = ({
             ) : (
                 <Table.Container>
                     <DataTable
-                        aria-labelledby="repositories"
-                        aria-describedby="repositories-subtitle"
+                        aria-labelledby="workloads"
+                        aria-describedby="workloads-subtitle"
                         data={paginatedData}
                         columns={columns}
                         initialSortColumn="updatedAt"

@@ -7,50 +7,6 @@ import SecurityCoverageTable from '../components/workloadList/SecurityCoverageTa
 import { ThemedBox } from '../components/workloadList/StyledComponents'
 import ColorModeSwitcher from '../ColorModeSwitcher'
 
-// Helper function to generate random long names
-const generateLongName = (prefix) => {
-    const adjectives = [
-        'Amazing',
-        'Innovative',
-        'Groundbreaking',
-        'Revolutionary',
-        'Cutting-edge',
-    ]
-    const nouns = ['Project', 'Application', 'System', 'Platform', 'Framework']
-    return `${prefix} ${
-        adjectives[Math.floor(Math.random() * adjectives.length)]
-    } ${nouns[Math.floor(Math.random() * nouns.length)]}`
-}
-
-// Helper function to generate random files with long names
-const generateFiles = () => {
-    const fileCount = Math.floor(Math.random() * 3) + 1
-    return Array(fileCount)
-        .fill()
-        .map((_, index) => ({
-            name: `${generateLongName('File')}${index + 1}.${
-                ['js', 'tsx', 'css'][Math.floor(Math.random() * 3)]
-            }`,
-        }))
-}
-
-// Modified mock data to include files with long names
-const mockData = Array(50)
-    .fill()
-    .map((_, index) => ({
-        name: generateLongName(`Repository ${index + 1}`),
-        files: generateFiles(),
-        type: ['public', 'private', 'internal'][Math.floor(Math.random() * 3)],
-        updatedAt: new Date(
-            Date.now() - Math.floor(Math.random() * 10000000000)
-        ).toISOString(),
-        securityFeatures: {
-            dependabot:
-                Math.random() > 0.5 ? ['alerts', 'security_updates'] : [],
-            codeScanning: Math.random() > 0.5 ? ['enabled'] : [],
-        },
-    }))
-
 const WorkloadList = () => {
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(true)
@@ -66,9 +22,19 @@ const WorkloadList = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true)
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-            setData(mockData)
-            setLoading(false)
+            try {
+                const response = await fetch('http://localhost:5000/api/workloads')
+                if (!response.ok) {
+                    throw new Error('Failed to fetch workloads')
+                }
+                const workloads = await response.json()
+                setData(workloads)
+            } catch (error) {
+                console.error('Error fetching workloads:', error)
+                // Handle error (e.g., show error message to user)
+            } finally {
+                setLoading(false)
+            }
         }
 
         fetchData()

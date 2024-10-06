@@ -30,11 +30,11 @@ const RepositoryItem = ({ row }) => {
                     {row.name}
                 </Link>
             </Box>
-            {isOpen && (
+            {isOpen && row.tasks && row.tasks.length > 0 && (
                 <Box ml={4} mt={2}>
-                    {row.files.map((file) => (
+                    {row.tasks.map((task) => (
                         <Box
-                            key={file.name}
+                            key={task.title}
                             display="flex"
                             alignItems="center"
                             mb={1}
@@ -46,7 +46,7 @@ const RepositoryItem = ({ row }) => {
                                 style={{ marginLeft: '8px' }}
                                 theme={theme}
                             >
-                                {file.name}
+                                {task.title}
                             </StyledFileLink>
                         </Box>
                     ))}

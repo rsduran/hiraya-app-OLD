@@ -1,17 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Box,
     Text,
     Button,
     FormControl,
     TextInput,
-    RadioGroup,
     Radio,
     Textarea,
     ActionMenu,
     ActionList,
     useTheme,
     ThemeProvider,
+    Spinner,
 } from '@primer/react'
 import {
     PencilIcon,
@@ -90,19 +90,51 @@ const WorkloadTaskPage = () => {
     const [taskTitle, setTaskTitle] = useState('')
     const [selectedWorkload, setSelectedWorkload] = useState('Create new workload')
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    const [visibility, setVisibility] = useState('private')
+    const [isLoading, setIsLoading] = useState(false)
+    const [currentDateTime, setCurrentDateTime] = useState('')
+    const [existingWorkloads, setExistingWorkloads] = useState(['Create new workload'])
     const { theme, colorMode } = useTheme()
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen)
     }
 
-    // Mock data for existing workloads
-    const existingWorkloads = [
-        'Create new workload',
-        'Workload 1',
-        'Workload 2',
-        'Workload 3',
-    ]
+    useEffect(() => {
+        const fetchWorkloads = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/workloads')
+                if (!response.ok) {
+                    throw new Error('Failed to fetch workloads')
+                }
+                const workloads = await response.json()
+                setExistingWorkloads(['Create new workload', ...workloads.map(w => w.name)])
+            } catch (error) {
+                console.error('Error fetching workloads:', error)
+            }
+        }
+
+        fetchWorkloads()
+    }, [])
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const now = new Date()
+            const options = {
+                timeZone: 'Asia/Manila',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            }
+            setCurrentDateTime(now.toLocaleString('en-US', options))
+        }, 1000)
+
+        return () => clearInterval(interval)
+    }, [])
 
     const renderMarkdown = () => {
         return { __html: marked(content) }
@@ -189,6 +221,39 @@ const WorkloadTaskPage = () => {
         }
     }
 
+    const handleSubmit = async () => {
+        setIsLoading(true);
+        try {
+            const response = await fetch('http://localhost:5000/api/workloads', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: selectedWorkload === 'Create new workload' ? workloadName : selectedWorkload,
+                    visibility: visibility,
+                    tasks: [
+                        {
+                            title: taskTitle,
+                            description: content
+                        }
+                    ]
+                }),
+            });
+            if (!response.ok) {
+                throw new Error('Failed to create workload');
+            }
+            const result = await response.json();
+            console.log('Workload created:', result);
+            // Reset form or navigate to a new page
+        } catch (error) {
+            console.error('Error creating workload:', error);
+            // Handle error (e.g., show error message to user)
+        } finally {
+            setIsLoading(false);
+        }
+    };  
+
     return (
         <ThemeProvider>
             <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -232,7 +297,7 @@ const WorkloadTaskPage = () => {
                                 color="fg.default"
                                 mb={3}
                             >
-                                Start a new Workload to put your task
+                                Create a new Workload or add a Task to an existing Workload
                             </Text>
                             <Text
                                 fontWeight={400}
@@ -245,10 +310,9 @@ const WorkloadTaskPage = () => {
                                 A Workload contains all of your tasks and helps you organize
                                 your work efficiently.
                             </Text>
-
-                            <FormControl mb={4}>
-                                <FormControl.Label htmlFor="existing-workload">
-                                    Select an existing workload
+                            <FormControl id="existing-workload" mb={4}>
+                                <FormControl.Label>
+                                    Select an existing workload or create a new one
                                 </FormControl.Label>
                                 <ActionMenu>
                                     <ActionMenu.Button>{selectedWorkload}</ActionMenu.Button>
@@ -268,66 +332,69 @@ const WorkloadTaskPage = () => {
                                 </ActionMenu>
                             </FormControl>
 
-                            <Box mb={3} />
-
                             {selectedWorkload === 'Create new workload' && (
-                                <FormControl mb={4}>
-                                    <FormControl.Label htmlFor="workload-name">
-                                        Workload name
+                                <FormControl id="workload-name" mb={4}>
+                                    <FormControl.Label>
+                                        New Workload name
                                     </FormControl.Label>
                                     <TextInput
-                                        id="workload-name"
                                         value={workloadName}
                                         onChange={(e) => setWorkloadName(e.target.value)}
                                         placeholder="Name your new workload..."
                                         sx={{ width: '100%' }}
                                     />
-                                    <Box mb={3} />
                                 </FormControl>
                             )}
 
-                            <RadioGroup name="visibility" mb={4}>
-                                <FormControl>
-                                    <Radio value="public" id="public" />
-                                    <FormControl.Label htmlFor="public">
-                                        Public
-                                    </FormControl.Label>
+                            <Box mb={4}>
+                                <Text fontWeight={600} fontSize="14px" mb={2} color="fg.default">
+                                    Visibility
+                                </Text>
+                                <FormControl id="visibility-public">
+                                    <Radio 
+                                        name="visibility" 
+                                        value="public" 
+                                        checked={visibility === 'public'}
+                                        onChange={() => setVisibility('public')}
+                                    />
+                                    <FormControl.Label>Public</FormControl.Label>
                                 </FormControl>
                                 <Text fontSize="12px" color="fg.muted" ml={4} mb={2}>
                                     Anyone can see this workload
                                 </Text>
-                                <FormControl>
-                                    <Radio value="private" id="private" defaultChecked />
-                                    <FormControl.Label htmlFor="private">
-                                        Private
-                                    </FormControl.Label>
+                                <FormControl id="visibility-private">
+                                    <Radio 
+                                        name="visibility" 
+                                        value="private" 
+                                        checked={visibility === 'private'}
+                                        onChange={() => setVisibility('private')}
+                                    />
+                                    <FormControl.Label>Private</FormControl.Label>
                                 </FormControl>
                                 <Text fontSize="12px" color="fg.muted" ml={4} mb={3}>
                                     Only you can see this workload
                                 </Text>
-                            </RadioGroup>
+                            </Box>
 
-                            <FormControl mb={4}>
-                                <FormControl.Label htmlFor="task-title">
-                                    Add a task title
+                            <FormControl id="task-title" mb={4}>
+                                <FormControl.Label>
+                                    Task title
                                 </FormControl.Label>
                                 <TextInput
-                                    id="task-title"
                                     value={taskTitle}
                                     onChange={(e) => setTaskTitle(e.target.value)}
                                     placeholder="Enter task title..."
                                     sx={{ width: '100%' }}
                                 />
-                                <Box mb={3} />
                             </FormControl>
 
                             <Text
                                 fontWeight={600}
                                 fontSize="14px"
                                 mb={2}
-                                color="fg.default"  // Add this line
+                                color="fg.default"
                             >
-                                Add a description
+                                Task description
                             </Text>
                             <Box
                                 bg="canvas.default"
@@ -410,16 +477,30 @@ const WorkloadTaskPage = () => {
                                 )}
                             </Box>
 
+                            <Box mb={4}>
+                                <Text fontSize="14px" color="fg.muted">
+                                    Current Date and Time (Philippine Time): {currentDateTime}
+                                </Text>
+                            </Box>
+
                             <Box
                                 sx={{
                                     display: 'flex',
                                     justifyContent: 'flex-end',
                                 }}
                             >
-                                <Button variant="primary">
-                                    {selectedWorkload !== 'Create new workload'
-                                        ? 'Create Task'
-                                        : 'Create Workload and Task'}
+                                <Button 
+                                    variant="primary" 
+                                    onClick={handleSubmit}
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? (
+                                        <Spinner size="small" />
+                                    ) : (
+                                        selectedWorkload !== 'Create new workload'
+                                            ? 'Create Task'
+                                            : 'Create Workload and Task'
+                                    )}
                                 </Button>
                             </Box>
                         </Box>

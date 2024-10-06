@@ -32,7 +32,7 @@ const Navbar = ({ toggleSidebar }) => {
             display="flex"
             alignItems="center"
             justifyContent="space-between"
-            p={2}
+            p={3} // Increased padding to increase height
             bg={colorMode === 'day' ? 'canvas.default' : 'canvas.inset'}
             borderBottom="1px solid"
             borderColor="border.default"
@@ -46,7 +46,8 @@ const Navbar = ({ toggleSidebar }) => {
                             color: 'fg.default',
                             bg: 'transparent',
                             ':hover': { bg: 'actionListItem.default.hoverBg' },
-                            mr: 2,
+                            mr: 3, // Increased right margin
+                            ml: 2, // Added left margin
                         }}
                         onClick={toggleSidebar}
                     />
@@ -56,11 +57,11 @@ const Navbar = ({ toggleSidebar }) => {
                     alt="Hiraya Logo"
                     width="32"
                     height="32"
+                    style={{ marginRight: '16px' }} // Added right margin
                 />
                 <Text
                     fontSize={1}
                     fontWeight={600}
-                    ml={2}
                     sx={{
                         fontFamily:
                             '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
@@ -141,7 +142,7 @@ const Navbar = ({ toggleSidebar }) => {
                 <Avatar
                     src="/placeholder.svg?height=32&width=32"
                     size={32}
-                    sx={{ ml: 2 }}
+                    sx={{ ml: 2, mr: 2 }} // Added right margin
                 />
             </Box>
         </Box>
