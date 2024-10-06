@@ -1,20 +1,22 @@
-import React, { useState } from 'react'
-import { Box, Link, useTheme } from '@primer/react'
-import {
-    FileIcon,
-    ChevronDownIcon,
-    ChevronRightIcon,
-} from '@primer/octicons-react'
-import { StyledIconButton, StyledFileLink } from './StyledComponents'
+import React, { useState } from 'react';
+import { Box, Link, useTheme } from '@primer/react';
+import { FileIcon, ChevronDownIcon, ChevronRightIcon } from '@primer/octicons-react';
+import { StyledIconButton, StyledFileLink } from './StyledComponents';
+import { useNavigate } from 'react-router-dom';
 
 const RepositoryItem = ({ row }) => {
-    const [isOpen, setIsOpen] = useState(false)
-    const { theme } = useTheme()
+    const [isOpen, setIsOpen] = useState(false);
+    const { theme } = useTheme();
+    const navigate = useNavigate();
 
     const toggleTree = (e) => {
-        e.stopPropagation()
-        setIsOpen(!isOpen)
-    }
+        e.stopPropagation();
+        setIsOpen(!isOpen);
+    };
+
+    const handleTaskClick = (taskId) => {
+        navigate(`/workloads/${row.id}/tasks/${taskId}`);
+    };
 
     return (
         <Box display="flex" flexDirection="column" width="100%">
@@ -34,7 +36,7 @@ const RepositoryItem = ({ row }) => {
                 <Box ml={4} mt={2}>
                     {row.tasks.map((task) => (
                         <Box
-                            key={task.title}
+                            key={task.id}
                             display="flex"
                             alignItems="center"
                             mb={1}
@@ -42,8 +44,8 @@ const RepositoryItem = ({ row }) => {
                         >
                             <FileIcon size={16} />
                             <StyledFileLink
-                                onClick={(e) => e.preventDefault()}
-                                style={{ marginLeft: '8px' }}
+                                onClick={() => handleTaskClick(task.id)}
+                                style={{ marginLeft: '8px', cursor: 'pointer' }}
                                 theme={theme}
                             >
                                 {task.title}
@@ -53,7 +55,7 @@ const RepositoryItem = ({ row }) => {
                 </Box>
             )}
         </Box>
-    )
-}
+    );
+};
 
-export default RepositoryItem
+export default RepositoryItem;

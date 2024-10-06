@@ -241,18 +241,20 @@ const WorkloadTaskPage = () => {
                 }),
             });
             if (!response.ok) {
-                throw new Error('Failed to create workload');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to create workload');
             }
             const result = await response.json();
             console.log('Workload created:', result);
             // Reset form or navigate to a new page
         } catch (error) {
-            console.error('Error creating workload:', error);
+            console.error('Error creating workload:', error.message);
             // Handle error (e.g., show error message to user)
+            // You might want to add a state variable to store and display this error message
         } finally {
             setIsLoading(false);
         }
-    };  
+    };
 
     return (
         <ThemeProvider>

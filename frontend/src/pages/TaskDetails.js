@@ -1,58 +1,71 @@
-import React, { useState } from 'react'
-import { Box, ThemeProvider, useTheme } from '@primer/react'
-import Navbar from '../common/Navbar'
-import Sidebar from '../common/Sidebar'
-import FileExplorer from '../components/taskDetails/FileExplorer'
-import PullRequestPage from '../components/taskDetails/PullRequestPage'
-import ColorModeSwitcher from '../ColorModeSwitcher'
+import React, { useState, useEffect } from 'react';
+import { Box, ThemeProvider, useTheme } from '@primer/react';
+import { useParams } from 'react-router-dom';
+import Navbar from '../common/Navbar';
+import Sidebar from '../common/Sidebar';
+import FileExplorer from '../components/taskDetails/FileExplorer';
+import TaskContent from '../components/taskDetails/TaskContent';
+import ColorModeSwitcher from '../ColorModeSwitcher';
 
 const TaskDetails = () => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-    const { theme, colorMode } = useTheme()
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [taskData, setTaskData] = useState(null);
+    const { colorMode } = useTheme();
+    const { workloadId, taskId } = useParams();
 
     const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen)
-    }
+        setIsSidebarOpen(!isSidebarOpen);
+    };
+
+    useEffect(() => {
+        const fetchTaskData = async () => {
+            try {
+                const response = await fetch(`http://localhost:5000/api/workloads/${workloadId}/tasks/${taskId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch task data');
+                }
+                const data = await response.json();
+                setTaskData(data);
+            } catch (error) {
+                console.error('Error fetching task data:', error);
+            }
+        };
+
+        if (workloadId && taskId) {
+            fetchTaskData();
+        }
+    }, [workloadId, taskId]);
 
     return (
         <ThemeProvider>
-            <Box
-                sx={{
-                    bg: colorMode === 'day' ? 'canvas.default' : 'canvas.inset',
-                    height: '100vh',
-                    color: 'fg.default',
-                    display: 'flex',
-                    flexDirection: 'column',
-                }}
-            >
+            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
                 <Box sx={{ position: 'absolute', top: 0, right: 0, p: 3, zIndex: 100 }}>
                     <ColorModeSwitcher />
                 </Box>
-
                 <Navbar toggleSidebar={toggleSidebar} />
-                <Sidebar
-                    isSidebarOpen={isSidebarOpen}
-                    toggleSidebar={toggleSidebar}
-                    textColor="fg.default"
-                    borderColor="border.default"
-                    sidebarBoxShadow={theme.shadows.shadow.medium}
-                    hoverColor="accent.fg"
-                />
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flex: 1,
+                <Box 
+                    sx={{ 
+                        display: 'flex', 
+                        flex: 1, 
                         overflow: 'hidden',
+                        bg: colorMode === 'day' ? 'canvas.default' : 'canvas.inset',
                     }}
                 >
-                    <FileExplorer />
-                    <Box sx={{ flex: 1, overflowY: 'auto' }}>
-                        <PullRequestPage />
+                    <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+                    <FileExplorer workloadId={workloadId} taskId={taskId} />
+                    <Box sx={{ flex: 1, overflow: 'auto', padding: 4 }}>
+                        {taskData ? (
+                            <>
+                                <TaskContent taskData={taskData} />
+                            </>
+                        ) : (
+                            <Box>Loading...</Box>
+                        )}
                     </Box>
                 </Box>
             </Box>
         </ThemeProvider>
-    )
-}
+    );
+};
 
-export default TaskDetails
+export default TaskDetails;

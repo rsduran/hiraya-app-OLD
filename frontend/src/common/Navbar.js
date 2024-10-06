@@ -73,7 +73,7 @@ const Navbar = ({ toggleSidebar }) => {
             </Box>
             <Box display="flex" alignItems="center">
                 <TextInput
-                    placeholder="Type / to search or ask Copilot"
+                    placeholder="Type / to search..."
                     sx={{ width: '300px' }}
                 />
                 <Box
